@@ -1,4 +1,7 @@
-# Z2-template
+# Drugie zadanie PROI
+
+## Informacje dodatkowe
+Zastąpienie tego pliku README.md, zawierającego dość oczywiste informacje, krótkim objaśnieniem założeń przyjętych przy realizacji zadania drugiego uważamy za bardzo dobry pomysł. 
 
 
 
