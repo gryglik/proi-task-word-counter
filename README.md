@@ -18,7 +18,7 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab-stud.elka.pw.edu.pl/rkozusze/z2-template.git
+git remote add origin https://gitlab-stud.elka.pw.edu.pl/rkozusze/z3-template.git
 git branch -M main
 git push -uf origin main
 ```
