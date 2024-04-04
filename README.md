@@ -25,7 +25,7 @@ git push -uf origin main
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](https://gitlab-stud.elka.pw.edu.pl/rkozusze/z2-template/-/settings/integrations)
+- [ ] [Set up project integrations](https://gitlab-stud.elka.pw.edu.pl/rkozusze/z3-template/-/settings/integrations)
 
 ## Collaborate with your team
 
