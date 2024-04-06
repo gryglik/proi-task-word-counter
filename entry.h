@@ -9,14 +9,14 @@ private:
     int count = 0;
 public:
     Entry() = default;
-    Entry(const std::string& value, int count = 0);
+    Entry(const std::string& val, int cnt = 0)
+        : value(val), count(cnt) {}
 
-    int operator++();
-    const std::string& operator*() const;
-    operator int() const;
+    const std::string& operator*() const {return value;};
+    operator int() const {return count;}
+    int operator++(int) {return count++;}
+
+    friend std::istream& operator>>(std::istream& is, Entry& entry);
 };
 
-std::ostream& operator<<(std::ostream& is, Entry& ent);
-std::ostream& operator>>(std::ostream& is, Entry& ent);
-
-
+std::ostream& operator<<(std::ostream& os, const Entry& entry);
