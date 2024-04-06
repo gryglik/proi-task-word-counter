@@ -23,8 +23,30 @@ public:
     friend std::istream& operator>>(std::istream& is, WordCounter& counter);
 
     class LexIterator;
+    LexIterator lexBegin() const;
+    LexIterator lexEnd() const;
+
     class FreqIterator;
 };
 
 std::ostream& operator<<(std::ostream& os, const WordCounter& counter);
 
+class WordCounter::LexIterator
+{
+private:
+    std::vector<Entry>::const_iterator iterator;
+public:
+    LexIterator();
+    LexIterator(std::vector<Entry>::const_iterator it)
+        : iterator(it) {}
+
+    LexIterator operator++(int);
+    LexIterator& operator++();
+    const Entry& operator*() const {return *iterator;}
+    bool operator!=(const LexIterator& it) const;
+};
+
+class WordCounter::FreqIterator
+{
+
+};
