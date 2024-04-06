@@ -11,7 +11,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-set(PROJECT_SOURCES entry.h word_counter.h)
+set(PROJECT_SOURCES entry.h entry.cpp word_counter.h word_counter.cpp)
 
 add_executable(testGoogle testGoogle.cpp ${PROJECT_SOURCES})
 
