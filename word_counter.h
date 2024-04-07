@@ -1,26 +1,38 @@
-#pragma once
 #include <vector>
 #include <initializer_list>
 #include "entry.h"
+
+const int HASH_TABLE_SIZE = 10;
 
 class WordCounter
 {
 private:
     std::vector<Entry> counter;
+    std::vector<std::reference_wrapper<Entry>> hashTable[HASH_TABLE_SIZE];
+
+    int hashFn(const std::string& word) const;
+
+    const std::vector<std::reference_wrapper<Entry>>& getHashChain(const std::string& word) const;
+    std::vector<std::reference_wrapper<Entry>>& getHashChain(const std::string& word);
+
+    const Entry& getEntry(const std::vector<std::reference_wrapper<Entry>>& entries_refs_chain, const std::string& word) const;
+    Entry& getEntry(std::vector<std::reference_wrapper<Entry>>& entries_refs_chain, const std::string& word);
+
+    bool isWord(const std::string& word) const;
 public:
     WordCounter() = default;
     WordCounter(std::initializer_list<Entry> entry_lst);
 
-    void addWord(std::string& word);
-    void addWords(std::istream& is);
-    void clear();
+    const Entry& operator[](const std::string& word) const;
+    Entry& operator[](const std::string& word);
 
-    const Entry& operator[](const std::string& value) const;
-    Entry& operator[](const std::string& value);
-
-    void operator+=(const std::string& value);
+    void operator+=(const std::string& word);
 
     friend std::istream& operator>>(std::istream& is, WordCounter& counter);
+
+    void addWord(const std::string& word);
+    void addWords(const std::istream& is);
+    void clear();
 
     class LexIterator;
     LexIterator lexBegin() const;
