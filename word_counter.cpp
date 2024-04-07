@@ -55,3 +55,14 @@ Entry& WordCounter::operator[](const std::string& word)
     const WordCounter& constWC = *this;
     return const_cast<Entry&>(constWC[word]);
 }
+
+void WordCounter::addWord(const std::string& word)
+{
+    if (this->isWord(word))
+        this->operator[](word)++;
+    else
+    {
+        this->counter.push_back(Entry(word, 1));
+        this->getHashChain(word).push_back(std::ref(*counter.rbegin()));
+    }
+}
