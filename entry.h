@@ -14,6 +14,7 @@ public:
 
     const std::string& operator*() const {return value;};
     operator int() const {return count;}
+    void operator+=(int add_value) {this->count+=add_value;}
     int operator++(int) {return count++;}
 
     friend std::istream& operator>>(std::istream& is, Entry& entry);
