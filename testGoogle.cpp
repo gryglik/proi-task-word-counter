@@ -69,7 +69,7 @@ TEST(EntryTest, left_shift_operator_typical)
     ASSERT_EQ(is.str(), "[urobek 1551]");
 }
 
-TEST(WordCounterTest, addWordc_create_indexOperator_typical)
+TEST(WordCounterTest, addWord_string)
 {
     WordCounter wc;
     wc.addWord("urobek");
@@ -78,6 +78,15 @@ TEST(WordCounterTest, addWordc_create_indexOperator_typical)
     ASSERT_EQ(int(wc["urobek"]), 2);
     wc.addWord("pragmatyzm");
     ASSERT_EQ(int(wc["pragmatyzm"]), 1);
+}
+
+TEST(WordCounterTest, addWord_Entry)
+{
+    WordCounter wc;
+    wc.addWord(Entry("urobek", 11009));
+    ASSERT_EQ(int(wc["urobek"]), 11009);
+    wc.addWord(Entry("urobek", 889));
+    ASSERT_EQ(int(wc["urobek"]), 11009+889);
 }
 
 // TEST(WordCounterTest, create_list)
@@ -97,4 +106,5 @@ TEST(WordCounterTest, addWord_empty)
 {
     WordCounter wc;
     EXPECT_THROW(wc.addWord(""), std::invalid_argument);
+    EXPECT_THROW(wc.addWord(Entry()), std::invalid_argument);
 }

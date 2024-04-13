@@ -49,6 +49,12 @@ WordCounter::WordCounter()
     hashTable.resize(this->hashTableSize);
 }
 
+// WordCounter::WordCounter(std::initializer_list<Entry> entry_lst)
+// {
+//     for (Entry ent : entry_lst)
+//         this->addWord(ent);
+// }
+
 const Entry& WordCounter::operator[](const std::string& word) const
 {
     if (! this->isWord(word))
@@ -73,10 +79,23 @@ void WordCounter::addWord(const std::string& word, int count)
     if (word.empty())
         throw(std::invalid_argument("Word cannot be empty"));
     if (this->isWord(word))
-        this->operator[](word)+=count;
+        this->operator[](word) += count;
     else
     {
         this->counter.push_back(Entry(word, count));
         this->getHashChain(word).push_back(std::ref(*counter.rbegin()));
+    }
+}
+
+void WordCounter::addWord(const Entry& entry)
+{
+    if ((*entry).empty())
+        throw(std::invalid_argument("Word cannot be empty"));
+    if (this->isWord(*(entry)))
+        this->operator[](*(entry)) += int(entry);
+    else
+    {
+        this->counter.push_back(Entry(entry));
+        this->getHashChain(*(entry)).push_back(std::ref(*counter.rbegin()));
     }
 }
