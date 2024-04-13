@@ -63,6 +63,11 @@ Entry& WordCounter::operator[](const std::string& word)
     return const_cast<Entry&>(constWC[word]);
 }
 
+void WordCounter::operator+=(const std::string& word)
+{
+    this->addWord(word);
+}
+
 void WordCounter::addWord(const std::string& word, int count)
 {
     if (word.empty())
