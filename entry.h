@@ -11,6 +11,7 @@ public:
     Entry() = default;
     Entry(const std::string& val, int cnt = 0)
         : value(val), count(cnt) {}
+    Entry(const Entry& entry);
 
     const std::string& operator*() const {return value;};
     operator int() const {return count;}

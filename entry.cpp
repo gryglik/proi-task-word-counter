@@ -1,5 +1,11 @@
 #include "entry.h"
 
+Entry::Entry(const Entry& entry)
+{
+    this->value = entry.value;
+    this->count = entry.count;
+}
+
 std::istream& operator>>(std::istream& is, Entry& entry)
 {
     char left, right;
