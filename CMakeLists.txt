@@ -14,5 +14,6 @@ FetchContent_MakeAvailable(googletest)
 set(PROJECT_SOURCES entry.h entry.cpp word_counter.h word_counter.cpp)
 
 add_executable(testGoogle testGoogle.cpp ${PROJECT_SOURCES})
+add_executable(moby_dick moby_dick.cpp ${PROJECT_SOURCES})
 
 target_link_libraries(testGoogle PUBLIC gtest_main)
