@@ -6,18 +6,18 @@
 class WordCounter
 {
 private:
-    static const int hashTableSize = 10000;
+    static const int indexHashTableSize = 2;
 
     std::vector<Entry> counter;
-    std::vector<std::vector<std::reference_wrapper<Entry>>> hashTable;
+    std::vector<std::vector<unsigned int>> indexHashTable;
 
     int hashFn(const std::string& word) const;
 
-    const std::vector<std::reference_wrapper<Entry>>& getHashChain(const std::string& word) const;
-    std::vector<std::reference_wrapper<Entry>>& getHashChain(const std::string& word);
+    const std::vector<unsigned int>& getIndexChain(const std::string& word) const;
+    std::vector<unsigned int>& getIndexChain(const std::string& word);
 
-    const Entry& getEntry(const std::vector<std::reference_wrapper<Entry>>& entries_refs_chain, const std::string& word) const;
-    Entry& getEntry(std::vector<std::reference_wrapper<Entry>>& entries_refs_chain, const std::string& word);
+    const Entry& getEntry(const  std::vector<unsigned int>& index_chain, const std::string& word) const;
+    Entry& getEntry(std::vector<unsigned int>& index_chain, const std::string& word);
 
     bool isWord(const std::string& word) const;
 public:
@@ -29,8 +29,8 @@ public:
 
     void operator+=(const std::string& word);
 
-    void addWord(const std::string& word, int count = 1);
     void addWord(const Entry& entry);
+    void addWord(const std::string& word, int count = 1);
     void addWords(std::istream& is);
 
     void clear();

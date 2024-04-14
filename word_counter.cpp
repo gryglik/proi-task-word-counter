@@ -3,41 +3,41 @@
 int WordCounter::hashFn(const std::string& word) const
 {
     std::hash<std::string> hash_fn;
-    return hash_fn(word) % hashTableSize;
+    return hash_fn(word) % indexHashTableSize;
 }
 
-const std::vector<std::reference_wrapper<Entry>>& WordCounter::getHashChain(const std::string& word) const
+const std::vector<unsigned int>& WordCounter::getIndexChain(const std::string& word) const
 {
-    return this->hashTable[this->hashFn(word)];
+    return this->indexHashTable[this->hashFn(word)];
 }
 
-std::vector<std::reference_wrapper<Entry>>& WordCounter::getHashChain(const std::string& word)
+std::vector<unsigned>& WordCounter::getIndexChain(const std::string& word)
 {
-    return this->hashTable[this->hashFn(word)];
+    return this->indexHashTable[this->hashFn(word)];
 }
 
-const Entry& WordCounter::getEntry(const std::vector<std::reference_wrapper<Entry>>& entries_refs_chain, const std::string& word) const
+const Entry& WordCounter::getEntry(const std::vector<unsigned int>& index_chain, const std::string& word) const
 {
-    auto i = std::find_if(
-        entries_refs_chain.begin(), entries_refs_chain.end(),
-        [&word](const std::reference_wrapper<Entry> &entry_ref){return *(entry_ref.get()) == word;});
+    auto it = std::find_if(
+        index_chain.begin(), index_chain.end(),
+        [=](int index){return *(this->counter[index]) == word;});
 
-    if (i == entries_refs_chain.end())
-        i = entries_refs_chain.begin();
-    return (*i).get();
+    if (it == index_chain.end())
+        return this->counter[*(index_chain.begin())];
+    return this->counter[*it];
 }
 
-Entry& WordCounter::getEntry(std::vector<std::reference_wrapper<Entry>>& entries_refs_chain, const std::string& word)
+Entry& WordCounter::getEntry(std::vector<unsigned int>& index_chain, const std::string& word)
 {
     const WordCounter& constWC = *this;
-    return const_cast<Entry&>(constWC.getEntry(entries_refs_chain, word));
+    return const_cast<Entry&>(constWC.getEntry(index_chain, word));
 }
 
 bool WordCounter::isWord(const std::string& word) const
 {
-    if (this->getHashChain(word).size() != 0)
+    if (this->getIndexChain(word).size() != 0)
     {
-        const Entry& entry = this->getEntry(this->getHashChain(word), word);
+        const Entry& entry = this->getEntry(this->getIndexChain(word), word);
         if (*entry == word)
             return true;
     }
@@ -46,21 +46,22 @@ bool WordCounter::isWord(const std::string& word) const
 
 WordCounter::WordCounter()
 {
-    hashTable.resize(this->hashTableSize);
+    this->indexHashTable.resize(this->indexHashTableSize);
 }
 
-// WordCounter::WordCounter(std::initializer_list<Entry> entry_lst)
-// {
-//     for (Entry ent : entry_lst)
-//         this->addWord(ent);
-// }
+WordCounter::WordCounter(std::initializer_list<Entry> entry_lst)
+{
+    this->indexHashTable.resize(this->indexHashTableSize);
+    for (const Entry& entry : entry_lst)
+        this->addWord(Entry(entry));
+}
 
 const Entry& WordCounter::operator[](const std::string& word) const
 {
     if (! this->isWord(word))
         throw(std::invalid_argument("Given word does not exist in word counter."));
 
-    return this->getEntry(this->getHashChain(word), word);
+    return this->getEntry(this->getIndexChain(word), word);
 }
 
 Entry& WordCounter::operator[](const std::string& word)
@@ -74,28 +75,21 @@ void WordCounter::operator+=(const std::string& word)
     this->addWord(word);
 }
 
-void WordCounter::addWord(const std::string& word, int count)
-{
-    if (word.empty())
-        throw(std::invalid_argument("Word cannot be empty"));
-    if (this->isWord(word))
-        this->operator[](word) += count;
-    else
-    {
-        this->counter.push_back(Entry(word, count));
-        this->getHashChain(word).push_back(std::ref(*counter.rbegin()));
-    }
-}
-
 void WordCounter::addWord(const Entry& entry)
 {
     if ((*entry).empty())
         throw(std::invalid_argument("Word cannot be empty"));
-    if (this->isWord(*(entry)))
-        this->operator[](*(entry)) += int(entry);
+    if (this->isWord(*entry))
+        this->operator[](*entry) += int(entry);
     else
     {
-        this->counter.push_back(Entry(entry));
-        this->getHashChain(*(entry)).push_back(std::ref(*counter.rbegin()));
+        this->counter.push_back(entry);
+        int index = this->counter.end() - this->counter.begin() - 1;
+        this->getIndexChain(*entry).push_back(index);
     }
+}
+
+void WordCounter::addWord(const std::string& word, int count)
+{
+    this->addWord(Entry(word, count));
 }
