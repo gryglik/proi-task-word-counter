@@ -93,3 +93,10 @@ void WordCounter::addWord(const std::string& word, int count)
 {
     this->addWord(Entry(word, count));
 }
+
+void WordCounter::clear()
+{
+    this->counter.clear();
+    this->indexHashTable.clear();
+    this->indexHashTable.resize(this->indexHashTableSize);
+}

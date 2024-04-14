@@ -104,3 +104,16 @@ TEST(WordCounterTest, addWord_empty)
     EXPECT_THROW(wc.addWord(""), std::invalid_argument);
     EXPECT_THROW(wc.addWord(Entry()), std::invalid_argument);
 }
+
+TEST(WordCounterTest, clear_typical)
+{
+    WordCounter wc;
+    wc.addWord("urobek");
+    wc.addWord("urobek");
+    wc.addWord("pragmatyzm");
+    ASSERT_EQ(int(wc["urobek"]), 2);
+    ASSERT_EQ(int(wc["pragmatyzm"]), 1);
+    wc.clear();
+    EXPECT_THROW(wc["urobek"], std::invalid_argument);
+    EXPECT_THROW(wc["pragmatyzm"], std::invalid_argument);
+}
