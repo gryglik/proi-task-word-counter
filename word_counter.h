@@ -6,7 +6,7 @@
 class WordCounter
 {
 private:
-    static const int indexHashTableSize = 2;
+    static const int indexHashTableSize = 10000;
 
     std::vector<Entry> counter;
     std::vector<std::vector<unsigned int>> indexHashTable;
