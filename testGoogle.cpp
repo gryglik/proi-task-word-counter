@@ -89,18 +89,14 @@ TEST(WordCounterTest, addWord_Entry)
     ASSERT_EQ(int(wc["urobek"]), 11009+889);
 }
 
-// TEST(WordCounterTest, create_list)
-// {
-//     WordCounter wc
-//     {
-//         {"urobek", 1911},
-//         {"kontrowersja", 1},
-//         {"Artur", 33}
-//     };
-//     ASSERT_EQ(int(wc["urobek"]), 1911);
-//     ASSERT_EQ(int(wc["ukontrowersja"]), 1);
-//     ASSERT_EQ(int(wc["Artur"]), 33);
-// }
+TEST(WordCounterTest, create_list)
+{
+    WordCounter wc{{"urobek", 1911},
+        {"kontrowersja", 1}, {"Artur", 33}};
+    ASSERT_EQ(int(wc["urobek"]), 1911);
+    ASSERT_EQ(int(wc["kontrowersja"]), 1);
+    ASSERT_EQ(int(wc["Artur"]), 33);
+}
 
 TEST(WordCounterTest, addWord_empty)
 {
