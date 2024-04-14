@@ -53,6 +53,32 @@ TEST(EntryTest, right_shift_operator_typical)
     ASSERT_EQ(int(ent1), 1551);
 }
 
+TEST(EntryTest, right_shift_no_word)
+{
+    Entry ent1;
+    std::stringstream is1, is2, is3, is4, is5, is6;
+    is1 << "[1551]";
+    EXPECT_THROW(is1 >> ent1, std::invalid_argument);
+    is2 << "[ 1551]";
+    EXPECT_THROW(is2 >> ent1, std::invalid_argument);
+    is3 << "[  1551]";
+    EXPECT_THROW(is3 >> ent1, std::invalid_argument);
+    is4 << "[urobek]";
+    EXPECT_THROW(is4 >> ent1, std::invalid_argument);
+    is5 << "[urobek ]";
+    EXPECT_THROW(is5 >> ent1, std::invalid_argument);
+    is6 << "[urobek  ]";
+    EXPECT_THROW(is6 >> ent1, std::invalid_argument);
+}
+
+TEST(EntryTest, right_shift_too_many_args)
+{
+    Entry ent1;
+    std::stringstream is1, is2, is3, is4, is5, is6;
+    is1 << "[analiza 12 2]";
+    EXPECT_THROW(is1 >> ent1, std::invalid_argument);
+}
+
 TEST(EntryTest, right_shift_operator_invalid_format)
 {
     Entry ent1;
@@ -105,6 +131,33 @@ TEST(WordCounterTest, addWord_empty)
     EXPECT_THROW(wc.addWord(Entry()), std::invalid_argument);
 }
 
+TEST(WordCounterTest, addWords_typical)
+{
+    WordCounter wc;
+    std::stringstream data("[urobek 1234] [pragmatyzm 18111] [Inkubacja 15]");
+    wc.addWords(data);
+    ASSERT_EQ(int(wc["urobek"]), 1234);
+    ASSERT_EQ(int(wc["pragmatyzm"]), 18111);
+    ASSERT_EQ(int(wc["Inkubacja"]), 15);
+}
+
+TEST(WordCounterTest, addWords_spaces)
+{
+    WordCounter wc;
+    std::stringstream data("[urobek 1234] [pragmatyzm 18111]  [Inkubacja 15] ");
+    wc.addWords(data);
+    ASSERT_EQ(int(wc["urobek"]), 1234);
+    ASSERT_EQ(int(wc["pragmatyzm"]), 18111);
+    ASSERT_EQ(int(wc["Inkubacja"]), 15);
+}
+
+TEST(WordCounterTest, addWords_no_word)
+{
+    WordCounter wc;
+    std::stringstream data("[ 1234] [pragmatyzm 18111]  [Inkubacja 15] ");
+    EXPECT_THROW(wc.addWords(data), std::invalid_argument);
+}
+
 TEST(WordCounterTest, clear_typical)
 {
     WordCounter wc;
@@ -116,4 +169,46 @@ TEST(WordCounterTest, clear_typical)
     wc.clear();
     EXPECT_THROW(wc["urobek"], std::invalid_argument);
     EXPECT_THROW(wc["pragmatyzm"], std::invalid_argument);
+}
+
+TEST(WordCounterTest, right_shift_operator_typical)
+{
+    WordCounter wc;
+    std::stringstream data("Anna idzie do kina z Marianem Anna i Marian są małżeństwem");
+    data >> wc;
+    ASSERT_EQ(int(wc["Anna"]), 2);
+    ASSERT_EQ(int(wc["idzie"]), 1);
+    ASSERT_EQ(int(wc["do"]), 1);
+    ASSERT_EQ(int(wc["kina"]), 1);
+    ASSERT_EQ(int(wc["z"]), 1);
+    ASSERT_EQ(int(wc["Marianem"]), 1);
+    ASSERT_EQ(int(wc["i"]), 1);
+    ASSERT_EQ(int(wc["Marian"]), 1);
+    ASSERT_EQ(int(wc["są"]), 1);
+    ASSERT_EQ(int(wc["małżeństwem"]), 1);
+}
+
+TEST(WordCounterTest, right_shift_operator_spaces)
+{
+    WordCounter wc;
+    std::stringstream data("Anna Anna  Anna  Anna");
+    data >> wc;
+    ASSERT_EQ(int(wc["Anna"]), 4);
+}
+
+TEST(WordCounterTest, right_shift_operator_enters)
+{
+    WordCounter wc;
+    std::stringstream data("Anna\nAnna \nAnna \n Anna Anna   \n  Anna");
+    data >> wc;
+    ASSERT_EQ(int(wc["Anna"]), 6);
+}
+
+TEST(WordCounterTest, right_shift_operator_enters_many_words)
+{
+    WordCounter wc;
+    std::stringstream data("Anna\nMarian \nMarian \n Anna Anna\nMarian\nMarian   \n  Anna");
+    data >> wc;
+    ASSERT_EQ(int(wc["Anna"]), 4);
+    ASSERT_EQ(int(wc["Marian"]), 4);
 }

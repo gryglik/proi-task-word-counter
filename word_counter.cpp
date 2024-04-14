@@ -94,9 +94,24 @@ void WordCounter::addWord(const std::string& word, int count)
     this->addWord(Entry(word, count));
 }
 
+void WordCounter::addWords(std::istream& is)
+{
+    Entry entry;
+    while (is >> entry)
+        this->addWord(entry);
+}
+
 void WordCounter::clear()
 {
     this->counter.clear();
     this->indexHashTable.clear();
     this->indexHashTable.resize(this->indexHashTableSize);
+}
+
+std::istream& operator>>(std::istream& is, WordCounter& counter)
+{
+    std::string word;
+    while (is >> word)
+        counter.addWord(word);
+    return is;
 }
