@@ -118,10 +118,26 @@ TEST(WordCounterTest, addWord_Entry)
 TEST(WordCounterTest, create_list)
 {
     WordCounter wc{{"urobek", 1911},
-        {"kontrowersja", 1}, {"Artur", 33}};
+        {"kontrowersja", 1}, {"artur", 33}};
     ASSERT_EQ(int(wc["urobek"]), 1911);
     ASSERT_EQ(int(wc["kontrowersja"]), 1);
-    ASSERT_EQ(int(wc["Artur"]), 33);
+    ASSERT_EQ(int(wc["artur"]), 33);
+}
+
+TEST(WordCounterTest, increase_operator_typical)
+{
+    WordCounter wc1{{"urobek", 1911},
+        {"kontrowersja", 1}, {"artur", 33}};
+    WordCounter wc2{{"urobek", 2},
+        {"pragmatyzm", 1}, {"inkubacja", 1}};
+    wc1 += wc2;
+    ASSERT_EQ(int(wc1["urobek"]), 1913);
+    ASSERT_EQ(int(wc1["kontrowersja"]), 1);
+    ASSERT_EQ(int(wc1["artur"]), 33);
+    ASSERT_EQ(int(wc1["pragmatyzm"]), 1);
+    ASSERT_EQ(int(wc1["inkubacja"]), 1);
+
+    EXPECT_THROW(wc2["kontrowersja"], std::invalid_argument);
 }
 
 TEST(WordCounterTest, addWord_empty)
@@ -133,28 +149,44 @@ TEST(WordCounterTest, addWord_empty)
 
 TEST(WordCounterTest, addWords_typical)
 {
-   WordCounter wc{{"urobek", 2},
-        {"pragmatyzm", 1}, {"inkubacja", 1}};
-    ASSERT_EQ(int(wc["urobek"]), 2);
-    ASSERT_EQ(int(wc["pragmatyzm"]), 1);
-    ASSERT_EQ(int(wc["inkubacja"]), 1);
+    WordCounter wc;
+    std::stringstream data("anna idzie do kina z marianem anna i marian są malzenstwem");
+    wc.addWords(data);
+    ASSERT_EQ(int(wc["anna"]), 2);
+    ASSERT_EQ(int(wc["idzie"]), 1);
+    ASSERT_EQ(int(wc["do"]), 1);
+    ASSERT_EQ(int(wc["kina"]), 1);
+    ASSERT_EQ(int(wc["z"]), 1);
+    ASSERT_EQ(int(wc["marianem"]), 1);
+    ASSERT_EQ(int(wc["i"]), 1);
+    ASSERT_EQ(int(wc["marian"]), 1);
+    ASSERT_EQ(int(wc["są"]), 1);
+    ASSERT_EQ(int(wc["malzenstwem"]), 1);
 }
 
 TEST(WordCounterTest, addWords_spaces)
 {
-    WordCounter wc{{"urobek", 2},
-        {"pragmatyzm", 1}, {"inkubacja", 1}};
-    ASSERT_EQ(int(wc["urobek"]), 2);
-    ASSERT_EQ(int(wc["pragmatyzm"]), 1);
-    ASSERT_EQ(int(wc["inkubacja"]), 1);
+    WordCounter wc;
+    std::stringstream data(" anna anna  anna  anna"  );
+    wc.addWords(data);
+    ASSERT_EQ(int(wc["anna"]), 4);
 }
 
-TEST(WordCounterTest, increase_operator_typical)
+TEST(WordCounterTest, addWords_new_lines)
 {
-    WordCounter wc1{{"urobek", 2},
-        {"pragmatyzm", 1}, {"inkubacja", 1}};
-    WordCounter wc{{"urobek", 1911},
-        {"kontrowersja", 1}, {"Artur", 33}};
+    WordCounter wc;
+    std::stringstream data("anna\nanna \nanna \n anna anna   \n  anna");
+    wc.addWords(data);
+    ASSERT_EQ(int(wc["anna"]), 6);
+}
+
+TEST(WordCounterTest, addWords_new_lines_many_words)
+{
+    WordCounter wc;
+    std::stringstream data("anna\nmarian \nmarian \n anna anna\nmarian\nmarian   \n  anna");
+    wc.addWords(data);
+    ASSERT_EQ(int(wc["anna"]), 4);
+    ASSERT_EQ(int(wc["marian"]), 4);
 }
 
 TEST(WordCounterTest, clear_typical)
@@ -168,48 +200,6 @@ TEST(WordCounterTest, clear_typical)
     wc.clear();
     EXPECT_THROW(wc["urobek"], std::invalid_argument);
     EXPECT_THROW(wc["pragmatyzm"], std::invalid_argument);
-}
-
-TEST(WordCounterTest, right_shift_operator_typical)
-{
-    WordCounter wc;
-    std::stringstream data("anna idzie do kina z marianem anna i marian są malzenstwem");
-    data >> wc;
-    ASSERT_EQ(int(wc["anna"]), 2);
-    ASSERT_EQ(int(wc["idzie"]), 1);
-    ASSERT_EQ(int(wc["do"]), 1);
-    ASSERT_EQ(int(wc["kina"]), 1);
-    ASSERT_EQ(int(wc["z"]), 1);
-    ASSERT_EQ(int(wc["marianem"]), 1);
-    ASSERT_EQ(int(wc["i"]), 1);
-    ASSERT_EQ(int(wc["marian"]), 1);
-    ASSERT_EQ(int(wc["są"]), 1);
-    ASSERT_EQ(int(wc["malzenstwem"]), 1);
-}
-
-TEST(WordCounterTest, right_shift_operator_spaces)
-{
-    WordCounter wc;
-    std::stringstream data("anna anna  anna  anna");
-    data >> wc;
-    ASSERT_EQ(int(wc["anna"]), 4);
-}
-
-TEST(WordCounterTest, right_shift_operator_enters)
-{
-    WordCounter wc;
-    std::stringstream data("anna\nanna \nanna \n anna anna   \n  anna");
-    data >> wc;
-    ASSERT_EQ(int(wc["anna"]), 6);
-}
-
-TEST(WordCounterTest, right_shift_operator_enters_many_words)
-{
-    WordCounter wc;
-    std::stringstream data("anna\nmarian \nmarian \n anna anna\nmarian\nmarian   \n  anna");
-    data >> wc;
-    ASSERT_EQ(int(wc["anna"]), 4);
-    ASSERT_EQ(int(wc["marian"]), 4);
 }
 
 TEST(WordCounterLexIteratorTest, lexBegin_typical)
