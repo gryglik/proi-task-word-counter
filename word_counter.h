@@ -1,5 +1,6 @@
 #include <vector>
 #include <initializer_list>
+#include <algorithm>
 #include "entry.h"
 
 
@@ -50,15 +51,20 @@ class WordCounter::LexIterator
 {
 private:
     std::vector<Entry>::const_iterator iterator;
+
+    std::vector<Entry>::const_iterator counterBegin;
+    std::vector<Entry>::const_iterator counterEnd;
 public:
     LexIterator();
-    LexIterator(std::vector<Entry>::const_iterator it)
-        : iterator(it) {}
+    LexIterator(std::vector<Entry>::const_iterator it,
+        std::vector<Entry>::const_iterator cnt_begin,
+        std::vector<Entry>::const_iterator cnt_end)
+        : iterator(it), counterBegin(cnt_begin), counterEnd(cnt_end){}
 
-    LexIterator operator++(int);
     LexIterator& operator++();
+    LexIterator operator++(int);
     const Entry& operator*() const {return *iterator;}
-    bool operator!=(const LexIterator& it) const;
+    bool operator!=(const LexIterator& it) const {return this->iterator != it.iterator;};
 };
 
 class WordCounter::FreqIterator

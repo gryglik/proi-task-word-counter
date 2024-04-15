@@ -115,3 +115,45 @@ std::istream& operator>>(std::istream& is, WordCounter& counter)
         counter.addWord(word);
     return is;
 }
+
+WordCounter::LexIterator WordCounter::lexBegin() const
+{
+    return WordCounter::LexIterator(
+    std::max_element(this->counter.begin(), this->counter.end(),
+        [](const Entry& ent1, const Entry& ent2){return *(ent1) > *(ent2);}),
+        this->counter.begin(), this->counter.end());
+}
+
+WordCounter::LexIterator WordCounter::lexEnd() const
+{
+   return WordCounter::LexIterator(this->counter.end(), this->counter.begin(), this->counter.end());
+}
+
+WordCounter::LexIterator& WordCounter::LexIterator::operator++()
+{
+    std::vector<Entry>::const_iterator old_it = this->iterator;
+
+    std::vector<Entry>::const_iterator new_it = this->counterEnd;
+    for (std::vector<Entry>::const_iterator it = this->counterBegin;
+        it != counterEnd;
+        it++)
+        if (**it > **old_it)
+        {
+            new_it = it;
+            break;
+        }
+    for (std::vector<Entry>::const_iterator it = this->counterBegin;
+        it != this->counterEnd && new_it != this->counterEnd;
+        it++)
+        if (**old_it < **it && **it < **new_it)
+            new_it = it;
+    this->iterator = new_it;
+    return *this;
+}
+
+WordCounter::LexIterator WordCounter::LexIterator::operator++(int)
+{
+    WordCounter::LexIterator old_it = *this;
+    this->operator++();
+    return old_it;
+}
