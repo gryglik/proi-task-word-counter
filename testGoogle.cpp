@@ -174,41 +174,69 @@ TEST(WordCounterTest, clear_typical)
 TEST(WordCounterTest, right_shift_operator_typical)
 {
     WordCounter wc;
-    std::stringstream data("Anna idzie do kina z Marianem Anna i Marian są małżeństwem");
+    std::stringstream data("anna idzie do kina z marianem anna i marian są malzenstwem");
     data >> wc;
-    ASSERT_EQ(int(wc["Anna"]), 2);
+    ASSERT_EQ(int(wc["anna"]), 2);
     ASSERT_EQ(int(wc["idzie"]), 1);
     ASSERT_EQ(int(wc["do"]), 1);
     ASSERT_EQ(int(wc["kina"]), 1);
     ASSERT_EQ(int(wc["z"]), 1);
-    ASSERT_EQ(int(wc["Marianem"]), 1);
+    ASSERT_EQ(int(wc["marianem"]), 1);
     ASSERT_EQ(int(wc["i"]), 1);
-    ASSERT_EQ(int(wc["Marian"]), 1);
+    ASSERT_EQ(int(wc["marian"]), 1);
     ASSERT_EQ(int(wc["są"]), 1);
-    ASSERT_EQ(int(wc["małżeństwem"]), 1);
+    ASSERT_EQ(int(wc["malzenstwem"]), 1);
 }
 
 TEST(WordCounterTest, right_shift_operator_spaces)
 {
     WordCounter wc;
-    std::stringstream data("Anna Anna  Anna  Anna");
+    std::stringstream data("anna anna  anna  anna");
     data >> wc;
-    ASSERT_EQ(int(wc["Anna"]), 4);
+    ASSERT_EQ(int(wc["anna"]), 4);
 }
 
 TEST(WordCounterTest, right_shift_operator_enters)
 {
     WordCounter wc;
-    std::stringstream data("Anna\nAnna \nAnna \n Anna Anna   \n  Anna");
+    std::stringstream data("anna\nanna \nanna \n anna anna   \n  anna");
     data >> wc;
-    ASSERT_EQ(int(wc["Anna"]), 6);
+    ASSERT_EQ(int(wc["anna"]), 6);
 }
 
 TEST(WordCounterTest, right_shift_operator_enters_many_words)
 {
     WordCounter wc;
-    std::stringstream data("Anna\nMarian \nMarian \n Anna Anna\nMarian\nMarian   \n  Anna");
+    std::stringstream data("anna\nmarian \nmarian \n anna anna\nmarian\nmarian   \n  anna");
     data >> wc;
-    ASSERT_EQ(int(wc["Anna"]), 4);
-    ASSERT_EQ(int(wc["Marian"]), 4);
+    ASSERT_EQ(int(wc["anna"]), 4);
+    ASSERT_EQ(int(wc["marian"]), 4);
+}
+
+TEST(WordCounterLexIteratorTest, lexBegin_typical)
+{
+    WordCounter wc;
+    std::stringstream data("anna idzie do kina z marianem anna i marian są malzenstwem");
+    data >> wc;
+    ASSERT_EQ(*(*wc.lexBegin()), "anna");
+}
+
+TEST(WordCounterLexIteratorTest, lexBegin_same_chars)
+{
+    WordCounter wc;
+    std::stringstream data("annam anno anna");
+    data >> wc;
+    ASSERT_EQ(*(*wc.lexBegin()), "anna");
+}
+
+TEST(WordCounterLexIteratorTest, lexEnd_iteration_typical)
+{
+    WordCounter wc;
+    std::stringstream data("marianem anna z marianem");
+    data >> wc;
+    auto it = wc.lexBegin();
+    ASSERT_EQ(**it++, "anna");
+    ASSERT_EQ(int(*it), 2);
+    ASSERT_EQ(**it++, "marianem");
+    ASSERT_EQ(**it++, "z");
 }
