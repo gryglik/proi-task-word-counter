@@ -28,7 +28,7 @@ TEST(EntryTest, create_copy)
     ASSERT_EQ(int(ent2), 18812);
 }
 
-TEST(EntryTest, addition_operator_typical)
+TEST(EntryTest, increase_operator_typical)
 {
     Entry ent1("urobek", 5);
     ASSERT_EQ(int(ent1), 5);
@@ -133,29 +133,28 @@ TEST(WordCounterTest, addWord_empty)
 
 TEST(WordCounterTest, addWords_typical)
 {
-    WordCounter wc;
-    std::stringstream data("[urobek 1234] [pragmatyzm 18111] [Inkubacja 15]");
-    wc.addWords(data);
-    ASSERT_EQ(int(wc["urobek"]), 1234);
-    ASSERT_EQ(int(wc["pragmatyzm"]), 18111);
-    ASSERT_EQ(int(wc["Inkubacja"]), 15);
+   WordCounter wc{{"urobek", 2},
+        {"pragmatyzm", 1}, {"inkubacja", 1}};
+    ASSERT_EQ(int(wc["urobek"]), 2);
+    ASSERT_EQ(int(wc["pragmatyzm"]), 1);
+    ASSERT_EQ(int(wc["inkubacja"]), 1);
 }
 
 TEST(WordCounterTest, addWords_spaces)
 {
-    WordCounter wc;
-    std::stringstream data("[urobek 1234] [pragmatyzm 18111]  [Inkubacja 15] ");
-    wc.addWords(data);
-    ASSERT_EQ(int(wc["urobek"]), 1234);
-    ASSERT_EQ(int(wc["pragmatyzm"]), 18111);
-    ASSERT_EQ(int(wc["Inkubacja"]), 15);
+    WordCounter wc{{"urobek", 2},
+        {"pragmatyzm", 1}, {"inkubacja", 1}};
+    ASSERT_EQ(int(wc["urobek"]), 2);
+    ASSERT_EQ(int(wc["pragmatyzm"]), 1);
+    ASSERT_EQ(int(wc["inkubacja"]), 1);
 }
 
-TEST(WordCounterTest, addWords_no_word)
+TEST(WordCounterTest, increase_operator_typical)
 {
-    WordCounter wc;
-    std::stringstream data("[ 1234] [pragmatyzm 18111]  [Inkubacja 15] ");
-    EXPECT_THROW(wc.addWords(data), std::invalid_argument);
+    WordCounter wc1{{"urobek", 2},
+        {"pragmatyzm", 1}, {"inkubacja", 1}};
+    WordCounter wc{{"urobek", 1911},
+        {"kontrowersja", 1}, {"Artur", 33}};
 }
 
 TEST(WordCounterTest, clear_typical)

@@ -70,9 +70,10 @@ Entry& WordCounter::operator[](const std::string& word)
     return const_cast<Entry&>(constWC[word]);
 }
 
-void WordCounter::operator+=(const std::string& word)
+void WordCounter::operator+=(const WordCounter& word_cnter)
 {
-    this->addWord(word);
+    for (const Entry& ent : word_cnter.counter)
+        this->addWord(ent);
 }
 
 void WordCounter::addWord(const Entry& entry)
@@ -96,9 +97,9 @@ void WordCounter::addWord(const std::string& word, int count)
 
 void WordCounter::addWords(std::istream& is)
 {
-    Entry entry;
-    while (is >> entry)
-        this->addWord(entry);
+   std::string word;
+    while (is >> word)
+        this->addWord(word);
 }
 
 void WordCounter::clear()
@@ -114,6 +115,11 @@ std::istream& operator>>(std::istream& is, WordCounter& counter)
     while (is >> word)
         counter.addWord(word);
     return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const WordCounter& counter)
+{
+    return os;
 }
 
 WordCounter::LexIterator WordCounter::lexBegin() const

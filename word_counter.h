@@ -28,7 +28,7 @@ public:
     const Entry& operator[](const std::string& word) const;
     Entry& operator[](const std::string& word);
 
-    void operator+=(const std::string& word);
+    void operator+=(const WordCounter& word_cnter);
 
     void addWord(const Entry& entry);
     void addWord(const std::string& word, int count = 1);
