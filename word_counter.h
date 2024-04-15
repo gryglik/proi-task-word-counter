@@ -42,10 +42,9 @@ public:
 
     class FreqIterator;
 
-    friend std::istream& operator>>(std::istream& is, WordCounter& counter);
+    friend std::istream& operator>>(std::istream& is, WordCounter& word_cnter);
+    friend std::ostream& operator<<(std::ostream& os, const WordCounter& word_cnter);
 };
-
-std::ostream& operator<<(std::ostream& os, const WordCounter& counter);
 
 class WordCounter::LexIterator
 {

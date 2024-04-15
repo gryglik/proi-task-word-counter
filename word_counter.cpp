@@ -109,16 +109,25 @@ void WordCounter::clear()
     this->indexHashTable.resize(this->indexHashTableSize);
 }
 
-std::istream& operator>>(std::istream& is, WordCounter& counter)
+std::istream& operator>>(std::istream& is, WordCounter& word_cnter)
 {
-    std::string word;
-    while (is >> word)
-        counter.addWord(word);
+    Entry ent;
+    while (is >> ent)
+        word_cnter.addWord(ent);
     return is;
 }
 
-std::ostream& operator<<(std::ostream& os, const WordCounter& counter)
+std::ostream& operator<<(std::ostream& os, const WordCounter& word_cnter)
 {
+    if (word_cnter.counter.size())
+    {
+        os << *word_cnter.counter.begin();
+        for (std::vector<Entry>::const_iterator it = ++word_cnter.counter.begin();
+            it != word_cnter.counter.end();
+            it++)
+            os << " " << *it;
+    }
+
     return os;
 }
 

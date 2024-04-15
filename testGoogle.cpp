@@ -202,11 +202,49 @@ TEST(WordCounterTest, clear_typical)
     EXPECT_THROW(wc["pragmatyzm"], std::invalid_argument);
 }
 
+TEST(WordCounterTest, right_shift_operator_import_typical)
+{
+    WordCounter wc;
+    std::stringstream data("[urobek 1234] [pragmatyzm 18111] [Inkubacja 15]");
+    data >> wc;
+    ASSERT_EQ(int(wc["urobek"]), 1234);
+    ASSERT_EQ(int(wc["pragmatyzm"]), 18111);
+    ASSERT_EQ(int(wc["Inkubacja"]), 15);
+}
+
+TEST(WordCounterTest, right_shift_operator_import_spaces)
+{
+    WordCounter wc;
+    std::stringstream data("[urobek 1234] [pragmatyzm 18111]  [Inkubacja 15] ");
+    data >> wc;
+    ASSERT_EQ(int(wc["urobek"]), 1234);
+    ASSERT_EQ(int(wc["pragmatyzm"]), 18111);
+    ASSERT_EQ(int(wc["Inkubacja"]), 15);
+}
+
+TEST(WordCounterTest, right_shift_operator_import_no_word)
+{
+    WordCounter wc;
+    std::stringstream data("[ 1234] [pragmatyzm 18111]  [Inkubacja 15] ");
+    EXPECT_THROW(data >> wc, std::invalid_argument);
+}
+
+TEST(WordCounterTest, left_shift_operator_export_typical)
+{
+    WordCounter wc;
+    std::stringstream input("[urobek 1234] [pragmatyzm 18111] [Inkubacja 15]");
+    input >> wc;
+
+    std::stringstream output;
+    output << wc;
+    ASSERT_EQ(output.str(),"[urobek 1234] [pragmatyzm 18111] [Inkubacja 15]");
+}
+
 TEST(WordCounterLexIteratorTest, lexBegin_typical)
 {
     WordCounter wc;
     std::stringstream data("anna idzie do kina z marianem anna i marian są malzenstwem");
-    data >> wc;
+    wc.addWords(data);
     ASSERT_EQ(*(*wc.lexBegin()), "anna");
 }
 
@@ -214,7 +252,7 @@ TEST(WordCounterLexIteratorTest, lexBegin_same_chars)
 {
     WordCounter wc;
     std::stringstream data("annam anno anna");
-    data >> wc;
+    wc.addWords(data);
     ASSERT_EQ(*(*wc.lexBegin()), "anna");
 }
 
@@ -222,7 +260,7 @@ TEST(WordCounterLexIteratorTest, lexEnd_iteration_typical)
 {
     WordCounter wc;
     std::stringstream data("marianem anna z marianem");
-    data >> wc;
+    wc.addWords(data);
     auto it = wc.lexBegin();
     ASSERT_EQ(**it++, "anna");
     ASSERT_EQ(int(*it), 2);
