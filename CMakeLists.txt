@@ -11,6 +11,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+configure_file(moby_dick.txt ${CMAKE_CURRENT_BINARY_DIR}/moby_dick.txt COPYONLY)
+
 set(PROJECT_SOURCES entry.h entry.cpp word_counter.h word_counter.cpp)
 
 add_executable(testGoogle testGoogle.cpp ${PROJECT_SOURCES})
