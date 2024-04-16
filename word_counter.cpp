@@ -1,47 +1,42 @@
 #include "word_counter.h"
 
-int WordCounter::hashFn(const std::string& word) const
+inline int WordCounter::hashFn(const std::string& word) const
 {
     std::hash<std::string> hash_fn;
     return hash_fn(word) % indexHashTableSize;
 }
 
-const std::vector<unsigned int>& WordCounter::getIndexChain(const std::string& word) const
+const Entry& WordCounter::getEntry(const std::string& word) const
 {
-    return this->indexHashTable[this->hashFn(word)];
-}
+    const std::vector<unsigned int>& index_chain = this->indexHashTable[this->hashFn(word)];
 
-std::vector<unsigned>& WordCounter::getIndexChain(const std::string& word)
-{
-    return this->indexHashTable[this->hashFn(word)];
-}
-
-const Entry& WordCounter::getEntry(const std::vector<unsigned int>& index_chain, const std::string& word) const
-{
     auto it = std::find_if(
         index_chain.begin(), index_chain.end(),
         [=](int index){return *(this->counter[index]) == word;});
 
     if (it == index_chain.end())
-        return this->counter[*(index_chain.begin())];
+        throw(std::invalid_argument("Given word does not exist in word counter."));
     return this->counter[*it];
 }
 
-Entry& WordCounter::getEntry(std::vector<unsigned int>& index_chain, const std::string& word)
+Entry& WordCounter::getEntry(const std::string& word, bool add)
 {
-    const WordCounter& constWC = *this;
-    return const_cast<Entry&>(constWC.getEntry(index_chain, word));
-}
+    std::vector<unsigned int>& index_chain = this->indexHashTable[this->hashFn(word)];
 
-bool WordCounter::isWord(const std::string& word) const
-{
-    if (this->getIndexChain(word).size() != 0)
+    auto it = std::find_if(
+        index_chain.begin(), index_chain.end(),
+        [=](int index){return *(this->counter[index]) == word;});
+
+    if (it != index_chain.end())
+        return this->counter[*it];
+
+    if (add)
     {
-        const Entry& entry = this->getEntry(this->getIndexChain(word), word);
-        if (*entry == word)
-            return true;
+        this->counter.push_back(Entry(word));
+        index_chain.push_back(this->counter.size() - 1);
+        return this->counter.back();
     }
-    return false;
+    throw(std::invalid_argument("Given word does not exist in word counter."));
 }
 
 WordCounter::WordCounter()
@@ -58,16 +53,12 @@ WordCounter::WordCounter(std::initializer_list<Entry> entry_lst)
 
 const Entry& WordCounter::operator[](const std::string& word) const
 {
-    if (! this->isWord(word))
-        throw(std::invalid_argument("Given word does not exist in word counter."));
-
-    return this->getEntry(this->getIndexChain(word), word);
+   return this->getEntry(word);
 }
 
 Entry& WordCounter::operator[](const std::string& word)
 {
-    const WordCounter& constWC = *this;
-    return const_cast<Entry&>(constWC[word]);
+    return this->getEntry(word);
 }
 
 void WordCounter::operator+=(const WordCounter& word_cnter)
@@ -76,18 +67,11 @@ void WordCounter::operator+=(const WordCounter& word_cnter)
         this->addWord(ent);
 }
 
-void WordCounter::addWord(const Entry& entry)
+void WordCounter::addWord(const Entry& ent)
 {
-    if ((*entry).empty())
+    if ((*ent).empty())
         throw(std::invalid_argument("Word cannot be empty"));
-    if (this->isWord(*entry))
-        this->operator[](*entry) += int(entry);
-    else
-    {
-        this->counter.push_back(entry);
-        int index = this->counter.end() - this->counter.begin() - 1;
-        this->getIndexChain(*entry).push_back(index);
-    }
+    this->getEntry(*ent, true) += int(ent);
 }
 
 void WordCounter::addWord(const std::string& word, int count)
@@ -127,42 +111,51 @@ std::ostream& operator<<(std::ostream& os, const WordCounter& word_cnter)
             it++)
             os << " " << *it;
     }
-
     return os;
 }
 
 WordCounter::LexIterator WordCounter::lexBegin() const
 {
     return WordCounter::LexIterator(
-    std::max_element(this->counter.begin(), this->counter.end(),
-        [](const Entry& ent1, const Entry& ent2){return *(ent1) > *(ent2);}),
+    std::min_element(this->counter.begin(), this->counter.end(),
+        [](const Entry& ent1, const Entry& ent2){return *(ent1) < *(ent2);}),
         this->counter.begin(), this->counter.end());
 }
 
 WordCounter::LexIterator WordCounter::lexEnd() const
 {
-   return WordCounter::LexIterator(this->counter.end(), this->counter.begin(), this->counter.end());
+   return WordCounter::LexIterator(this->counter.end(), this->counter.end(), this->counter.end());
 }
+
+WordCounter::LexIterator::LexIterator(std::vector<Entry>::const_iterator it,
+    std::vector<Entry>::const_iterator cnt_begin,
+    std::vector<Entry>::const_iterator cnt_end)
+    {
+        this->counterBegin = cnt_begin;
+        this->counterEnd = cnt_end;
+
+        for (std::vector<Entry>::const_iterator iterator = cnt_begin; iterator!=cnt_end; iterator++)
+        {
+            this->iteratorTable.push_back(iterator);
+        }
+
+        sort(iteratorTable.begin(), iteratorTable.end(),
+        [=](auto i1, auto i2){return **i1 < **i2;});
+        this->iteratorTable.push_back(cnt_end);
+
+        for (int i=0; i != this->iteratorTable.size(); i++)
+        {
+            if (this->iteratorTable[i] == it)
+            {
+                this->index = i;
+                break;
+            }
+        }
+    }
 
 WordCounter::LexIterator& WordCounter::LexIterator::operator++()
 {
-    std::vector<Entry>::const_iterator old_it = this->iterator;
-
-    std::vector<Entry>::const_iterator new_it = this->counterEnd;
-    for (std::vector<Entry>::const_iterator it = this->counterBegin;
-        it != counterEnd;
-        it++)
-        if (**it > **old_it)
-        {
-            new_it = it;
-            break;
-        }
-    for (std::vector<Entry>::const_iterator it = this->counterBegin;
-        it != this->counterEnd && new_it != this->counterEnd;
-        it++)
-        if (**old_it < **it && **it < **new_it)
-            new_it = it;
-    this->iterator = new_it;
+    index++;
     return *this;
 }
 

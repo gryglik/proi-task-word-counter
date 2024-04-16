@@ -1,26 +1,20 @@
 #include <vector>
+#include <list>
 #include <initializer_list>
 #include <algorithm>
 #include "entry.h"
 
-
 class WordCounter
 {
 private:
-    static const int indexHashTableSize = 10000;
-
+    static const int indexHashTableSize = 100000;
     std::vector<Entry> counter;
     std::vector<std::vector<unsigned int>> indexHashTable;
 
-    int hashFn(const std::string& word) const;
+    inline int hashFn(const std::string& word) const;
 
-    const std::vector<unsigned int>& getIndexChain(const std::string& word) const;
-    std::vector<unsigned int>& getIndexChain(const std::string& word);
-
-    const Entry& getEntry(const  std::vector<unsigned int>& index_chain, const std::string& word) const;
-    Entry& getEntry(std::vector<unsigned int>& index_chain, const std::string& word);
-
-    bool isWord(const std::string& word) const;
+    const Entry& getEntry(const std::string& word) const;
+    Entry& getEntry(const std::string& word, bool add=false);
 public:
     WordCounter();
     WordCounter(std::initializer_list<Entry> entry_lst);
@@ -49,21 +43,22 @@ public:
 class WordCounter::LexIterator
 {
 private:
-    std::vector<Entry>::const_iterator iterator;
-
     std::vector<Entry>::const_iterator counterBegin;
     std::vector<Entry>::const_iterator counterEnd;
+
+    std::vector<std::vector<Entry>::const_iterator> iteratorTable;
+    int index;
 public:
     LexIterator();
     LexIterator(std::vector<Entry>::const_iterator it,
         std::vector<Entry>::const_iterator cnt_begin,
-        std::vector<Entry>::const_iterator cnt_end)
-        : iterator(it), counterBegin(cnt_begin), counterEnd(cnt_end){}
+        std::vector<Entry>::const_iterator cnt_end);
 
     LexIterator& operator++();
     LexIterator operator++(int);
-    const Entry& operator*() const {return *iterator;}
-    bool operator!=(const LexIterator& it) const {return this->iterator != it.iterator;};
+    const Entry& operator*() const {return *(this->iteratorTable[index]);}
+    bool operator!=(const LexIterator& it) const
+        {return this->iteratorTable[this->index] != it.iteratorTable[it.index];};
 };
 
 class WordCounter::FreqIterator
