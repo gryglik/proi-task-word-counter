@@ -9,6 +9,7 @@ class WordCounter
 private:
     static const int indexHashTableSize = 100000;
     std::vector<Entry> counter;
+    std::vector<std::vector<Entry>::const_iterator> iteratorLexTable;
     std::vector<std::vector<unsigned int>> indexHashTable;
 
     inline int hashFn(const std::string& word) const;
@@ -31,7 +32,7 @@ public:
     void clear();
 
     class LexIterator;
-    LexIterator lexBegin() const;
+    LexIterator lexBegin();
     LexIterator lexEnd() const;
 
     class FreqIterator;
@@ -49,7 +50,6 @@ private:
     std::vector<std::vector<Entry>::const_iterator> iteratorTable;
     int index;
 public:
-    LexIterator();
     LexIterator(std::vector<Entry>::const_iterator it,
         std::vector<Entry>::const_iterator cnt_begin,
         std::vector<Entry>::const_iterator cnt_end);

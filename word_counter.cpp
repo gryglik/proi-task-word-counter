@@ -29,11 +29,11 @@ Entry& WordCounter::getEntry(const std::string& word, bool add)
 
     if (it != index_chain.end())
         return this->counter[*it];
-
     if (add)
     {
         this->counter.push_back(Entry(word));
         index_chain.push_back(this->counter.size() - 1);
+        this->iteratorLexTable.push_back(this->counter.end()-1);
         return this->counter.back();
     }
     throw(std::invalid_argument("Given word does not exist in word counter."));
@@ -114,7 +114,7 @@ std::ostream& operator<<(std::ostream& os, const WordCounter& word_cnter)
     return os;
 }
 
-WordCounter::LexIterator WordCounter::lexBegin() const
+WordCounter::LexIterator WordCounter::lexBegin()
 {
     return WordCounter::LexIterator(
     std::min_element(this->counter.begin(), this->counter.end(),
@@ -134,23 +134,18 @@ WordCounter::LexIterator::LexIterator(std::vector<Entry>::const_iterator it,
         this->counterBegin = cnt_begin;
         this->counterEnd = cnt_end;
 
+        // Tworzenie tablicy iteratorow
         for (std::vector<Entry>::const_iterator iterator = cnt_begin; iterator!=cnt_end; iterator++)
-        {
             this->iteratorTable.push_back(iterator);
-        }
 
-        sort(iteratorTable.begin(), iteratorTable.end(),
-        [=](auto i1, auto i2){return **i1 < **i2;});
+        // Sortowanie tablicy iteratorow
+        sort(this->iteratorTable.begin(), this->iteratorTable.end(),
+            [=](std::vector<Entry>::const_iterator i1, std::vector<Entry>::const_iterator i2)
+                {return **i1 < **i2;});
         this->iteratorTable.push_back(cnt_end);
 
-        for (int i=0; i != this->iteratorTable.size(); i++)
-        {
-            if (this->iteratorTable[i] == it)
-            {
-                this->index = i;
-                break;
-            }
-        }
+        // Szukanie elementu poczatkowego
+        this->index = std::find(iteratorTable.begin(), iteratorTable.end(), it) - this->iteratorTable.begin();
     }
 
 WordCounter::LexIterator& WordCounter::LexIterator::operator++()
