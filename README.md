@@ -1,25 +1,27 @@
-# words counter
-Zadaniem jest przygotowanie licznika słów, który posłuży do analizy częstości występowania słów w różnych pracach.
-W pierwszym kroku trzeba spisać, jaką funkcjonalność powinna realizować klasa licznika:
-- dodanie słowa,
-- dodanie słów odczytywanych ze strumienia,
-- wyczyszczenie zawartości licznika,
-- dodanie słów z innego licznika,
-- zapis zawartości licznika do pliku,
-- odczyt zawartości licznika z pliku,
-- iterator przechodzący przez słowa alfabetycznie,
-- iterator przechodzący przez słowa wg częstości wystąpień (od najczęściej występującego słowa).
+# Dane autora
+- **imię i nazwisko:** Michał Gryglicki
+- **Numer indeksu:** 331380
 
-Wygląda na to, że słowo i liczba jego wystąpień będą podstawowym elementem, który powinniśmy składać w kolekcji. Mamy zatem do napisania klasę reprezentującą element kolekcji (powiedzmy, że będzie nazywać się entry) i wybranie kolekcji z biblioteki standardowej. Zgodnie z ogólnymi zaleceniami, jeśli nie ma istotnych przesłanek przeciw, powinniśmy wybrać vector
+# Założenia:
+1) Dodawanie słów do licznika słów w czasie stałym (prawie).
+2) Wyszukiwanie słów w liczniku w czasie stałym (prawie).
+3) Iterator leksykograficzny na słowa typu constant (zakaz modyfikowania licznika podczas iteracji)
+4) Iterator częstości wystąpień na słowa typu constant (zakaz modyfikowania licznika podczas iteracji)
 
-Proszę zdefiniować klasę entry ze składowymi value (typu std::string) i count (typu int).
-Prócz konstruktorów (jakich?) w klasie będą potrzebne:
+# Realizacja:
+Słowa w licznku są przechowywane w wektorze (std::vector) w kolejności dodawania do licznika
 
-- operator ++ (w wersji post), który zwiększa o 1 składową count;
-- jednoargumentowy operator * (operator wyłuskania), który zwróci ustaloną referencję na składową value;
-- operator konwersji na typ int zwracający wartość składowej count;
-- operatory wyprowadzania << na strumień i wprowadzania << ze strumienia kompatybilne ze sobą (to nie mogą być metody klasy, ale będziemy tych operatorów potrzebować)
+## Wyszukiwanie / Dodawanie słów do licznika
+Wprowadziłem tablice hashująco-łańcuchową, która dla danego słowa (string) zwraca listę indeksów, pośród których znajduje się indeks szukanego słowa. Dobranie odpowiednio dużego rozmiaru tablicy hashującej pozwala na osiągnięcie efektu prawie stałej złożoności czasowej w dostępie do wyszukiwanego słowa (Entry). Dzieje się tak, gdyż
+>[wektor wszystkich Entry].size() << [wektor zwracany przez tablice hashującą].size()
 
-Proszę zdefiniować klasę word_counter z prywatną składową, która jest wektorem obiektów typu entry. Czy potrzebujemy w tej klasie konstruktora domyślnego? Jaki stan licznika słów powinien być obserwowany po utworzeniu domyślnego licznika? Jak ten stan sprawdzić?
+## Iteracja leksykograficzna
 
+## Iteracja częstości wystąpień
 
+# Statystyki
+```
+Creation time: 73 ms.
+Lexicographical iteration time: 3 ms.
+Frequency iteration time: 84 ms.
+```

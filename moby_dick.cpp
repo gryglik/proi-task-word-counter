@@ -13,15 +13,37 @@ int main()
     auto end_time = std::chrono::high_resolution_clock::now();
     in.close();
 
-    std::cout << "Create time: "
+    std::cout << "Creation time: "
     << (end_time - start_time) / std::chrono::milliseconds(1) << " ms.\n";
 
     //Lexicographical iteration time
+    std::ofstream out("LEX.txt");
+    auto it = wc.lexBegin();
+    auto end = wc.lexEnd();
     start_time = std::chrono::high_resolution_clock::now();
-    for (auto it = wc.lexBegin(); it != wc.lexEnd(); it++) {}
+    while (it != end)
+    {
+        out << *it;
+        ++it;
+    }
     end_time = std::chrono::high_resolution_clock::now();
-
+    out.close();
     std::cout << "Lexicographical iteration time: "
+    << (end_time - start_time) / std::chrono::milliseconds(1) << " ms.\n";
+
+    //Frequency iteration time
+    std::ofstream out2("LEX.txt");
+    auto it2 = wc.freqBegin();
+    auto end2 = wc.freqEnd();
+    start_time = std::chrono::high_resolution_clock::now();
+    while (it2 != end2)
+    {
+        out2 << *it2;
+        ++it2;
+    }
+    end_time = std::chrono::high_resolution_clock::now();
+    out2.close();
+    std::cout << "Frequency iteration time: "
     << (end_time - start_time) / std::chrono::milliseconds(1) << " ms.\n";
 
     return 0;
