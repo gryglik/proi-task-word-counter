@@ -111,14 +111,14 @@ WordCounter::LexIterator WordCounter::lexEnd() const
    return WordCounter::LexIterator(this->counter.end(), this->counter.end(), this->counter.end());
 }
 
-WordCounter::FreqIterator WordCounter::FreqBegin() const
+WordCounter::FreqIterator WordCounter::freqBegin() const
 {
     return WordCounter::FreqIterator(std::max_element(this->counter.begin(), this->counter.end(),
         [](const Entry& ent1, const Entry& ent2){return int(ent1) < int(ent2);}),
         this->counter.begin(), this->counter.end());
 }
 
-WordCounter::FreqIterator WordCounter::FreqEnd() const
+WordCounter::FreqIterator WordCounter::freqEnd() const
 {
     return WordCounter::FreqIterator(this->counter.end(), this->counter.end(), this->counter.end());
 }
@@ -176,6 +176,7 @@ WordCounter::FreqIterator& WordCounter::FreqIterator::operator++()
     for (auto i = this->counterBegin; i != iterator; i++)
     {
         if (maximum == iterator && int(*i) < int(*iterator)
+            || i < maximum && int(*i) < int(*iterator) && int(*i) >= int(*maximum)
             || int(*i) < int(*iterator) && int(*i) > int(*maximum))
             maximum = i;
     }
@@ -185,4 +186,11 @@ WordCounter::FreqIterator& WordCounter::FreqIterator::operator++()
     else
         this->iterator = maximum;
     return *this;
+}
+
+WordCounter::FreqIterator WordCounter::FreqIterator::operator++(int)
+{
+    WordCounter::FreqIterator old_it = *this;
+    this->operator++();
+    return old_it;
 }
