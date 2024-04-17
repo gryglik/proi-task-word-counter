@@ -32,7 +32,7 @@ int main()
     << (end_time - start_time) / std::chrono::milliseconds(1) << " ms.\n";
 
     //Frequency iteration time
-    std::ofstream out2("LEX.txt");
+    std::ofstream out2("FREQ.txt");
     auto it2 = wc.freqBegin();
     auto end2 = wc.freqEnd();
     start_time = std::chrono::high_resolution_clock::now();
