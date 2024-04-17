@@ -33,7 +33,6 @@ Entry& WordCounter::getEntry(const std::string& word, bool add)
     {
         this->counter.push_back(Entry(word));
         index_chain.push_back(this->counter.size() - 1);
-        this->iteratorLexTable.push_back(this->counter.end()-1);
         return this->counter.back();
     }
     throw(std::invalid_argument("Given word does not exist in word counter."));
@@ -51,16 +50,6 @@ WordCounter::WordCounter(std::initializer_list<Entry> entry_lst)
         this->addWord(Entry(entry));
 }
 
-const Entry& WordCounter::operator[](const std::string& word) const
-{
-   return this->getEntry(word);
-}
-
-Entry& WordCounter::operator[](const std::string& word)
-{
-    return this->getEntry(word);
-}
-
 void WordCounter::operator+=(const WordCounter& word_cnter)
 {
     for (const Entry& ent : word_cnter.counter)
@@ -72,11 +61,6 @@ void WordCounter::addWord(const Entry& ent)
     if ((*ent).empty())
         throw(std::invalid_argument("Word cannot be empty"));
     this->getEntry(*ent, true) += int(ent);
-}
-
-void WordCounter::addWord(const std::string& word, int count)
-{
-    this->addWord(Entry(word, count));
 }
 
 void WordCounter::addWords(std::istream& is)
@@ -114,7 +98,7 @@ std::ostream& operator<<(std::ostream& os, const WordCounter& word_cnter)
     return os;
 }
 
-WordCounter::LexIterator WordCounter::lexBegin()
+WordCounter::LexIterator WordCounter::lexBegin() const
 {
     return WordCounter::LexIterator(
     std::min_element(this->counter.begin(), this->counter.end(),
@@ -125,6 +109,18 @@ WordCounter::LexIterator WordCounter::lexBegin()
 WordCounter::LexIterator WordCounter::lexEnd() const
 {
    return WordCounter::LexIterator(this->counter.end(), this->counter.end(), this->counter.end());
+}
+
+WordCounter::FreqIterator WordCounter::FreqBegin() const
+{
+    return WordCounter::FreqIterator(std::max_element(this->counter.begin(), this->counter.end(),
+        [](const Entry& ent1, const Entry& ent2){return int(ent1) < int(ent2);}),
+        this->counter.begin(), this->counter.end());
+}
+
+WordCounter::FreqIterator WordCounter::FreqEnd() const
+{
+    return WordCounter::FreqIterator(this->counter.end(), this->counter.end(), this->counter.end());
 }
 
 WordCounter::LexIterator::LexIterator(std::vector<Entry>::const_iterator it,
@@ -159,4 +155,34 @@ WordCounter::LexIterator WordCounter::LexIterator::operator++(int)
     WordCounter::LexIterator old_it = *this;
     this->operator++();
     return old_it;
+}
+
+WordCounter::FreqIterator& WordCounter::FreqIterator::operator++()
+{
+    std::vector<Entry>::const_iterator maximum = iterator;
+
+    for (auto i = iterator + 1; i != this->counterEnd; i++)
+    {
+        if (int(*i) == int(*iterator))
+        {
+            this->iterator = i;
+            return *this;
+        }
+        if (maximum == iterator && int(*i) < int(*iterator)
+            || int(*i) < int(*iterator) && int(*i) > int(*maximum))
+            maximum = i;
+    }
+
+    for (auto i = this->counterBegin; i != iterator; i++)
+    {
+        if (maximum == iterator && int(*i) < int(*iterator)
+            || int(*i) < int(*iterator) && int(*i) > int(*maximum))
+            maximum = i;
+    }
+
+    if (maximum == iterator)
+        this->iterator = this->counterEnd;
+    else
+        this->iterator = maximum;
+    return *this;
 }
