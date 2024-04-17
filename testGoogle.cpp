@@ -256,6 +256,26 @@ TEST(WordCounterLexIteratorTest, lexBegin_same_chars)
     ASSERT_EQ(*(*wc.lexBegin()), "anna");
 }
 
+TEST(WordCounterLexIteratorTest, post_incrementation)
+{
+    WordCounter wc;
+    std::stringstream data("annam anno anna marek");
+    wc.addWords(data);
+    auto it = wc.lexBegin();
+    ASSERT_EQ(**it++, "anna");
+    ASSERT_EQ(**it, "annam");
+}
+
+TEST(WordCounterLexIteratorTest, pre_incrementation)
+{
+    WordCounter wc;
+    std::stringstream data("annam anno anna marek");
+    wc.addWords(data);
+    auto it = wc.lexBegin();
+    ASSERT_EQ(**++it, "annam");
+    ASSERT_EQ(**it, "annam");
+}
+
 TEST(WordCounterLexIteratorTest, lexEnd_iteration_typical)
 {
     WordCounter wc;
@@ -266,4 +286,54 @@ TEST(WordCounterLexIteratorTest, lexEnd_iteration_typical)
     ASSERT_EQ(int(*it), 2);
     ASSERT_EQ(**it++, "marianem");
     ASSERT_EQ(**it++, "z");
+    ASSERT_EQ(it != wc.lexEnd(), false);
+}
+
+TEST(WordCounterFreqIteratorTest, freqBegin_typical)
+{
+    WordCounter wc;
+    std::stringstream data("idzie anna do kina z marianem anna i marian są malzenstwem");
+    wc.addWords(data);
+    ASSERT_EQ(*(*wc.freqBegin()), "anna");
+}
+
+TEST(WordCounterFreqIteratorTest, freqBegin_same_count)
+{
+    WordCounter wc;
+    std::stringstream data("idzie anna idzie anna");
+    wc.addWords(data);
+    ASSERT_EQ(*(*wc.freqBegin()), "idzie");
+}
+
+TEST(WordCounterFreqIteratorTest, post_incrementation)
+{
+    WordCounter wc;
+    std::stringstream data("tomek anna marek marek zosia");
+    wc.addWords(data);
+    auto it = wc.freqBegin();
+    ASSERT_EQ(**it++, "marek");
+    ASSERT_EQ(**it, "tomek");
+}
+
+TEST(WordCounterFreqIteratorTest, pre_incrementation)
+{
+    WordCounter wc;
+    std::stringstream data("tomek anna marek marek zosia");
+    wc.addWords(data);
+    auto it = wc.freqBegin();
+    ASSERT_EQ(**++it, "tomek");
+    ASSERT_EQ(**it, "tomek");
+}
+
+TEST(WordCounterFreqIteratorTest, freqBegin_full_iteration)
+{
+    WordCounter wc;
+    std::stringstream data("idzie anna z marianem z marianem anna z marianem anna idzie marianem idzie anna");
+    wc.addWords(data);
+    auto freq_it = wc.freqBegin();
+    ASSERT_EQ(**freq_it++, "anna");
+    ASSERT_EQ(**freq_it++, "marianem");
+    ASSERT_EQ(**freq_it++, "idzie");
+    ASSERT_EQ(**freq_it++, "z");
+    ASSERT_EQ(freq_it != wc.freqEnd(), false);
 }
