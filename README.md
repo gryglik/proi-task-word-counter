@@ -9,7 +9,6 @@
 4) Iterator częstości wystąpień na słowa typu constant (zakaz modyfikowania licznika podczas iteracji)
 
 # Realizacja:
-Słowa w licznku są przechowywane w wektorze (std::vector) w kolejności dodawania do licznika
 
 ## Wyszukiwanie / Dodawanie słów do licznika
 Wprowadziłem tablice hashująco-łańcuchową, która dla danego słowa (string) zwraca listę indeksów, pośród których znajduje się indeks szukanego słowa. Dobranie odpowiednio dużego rozmiaru tablicy hashującej pozwala na osiągnięcie efektu prawie stałej złożoności czasowej w dostępie do wyszukiwanego słowa (Entry). Dzieje się tak, gdyż
