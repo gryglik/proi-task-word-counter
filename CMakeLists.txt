@@ -12,6 +12,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 configure_file(moby_dick.txt ${CMAKE_CURRENT_BINARY_DIR}/moby_dick.txt COPYONLY)
+configure_file(10x_moby_dick.txt ${CMAKE_CURRENT_BINARY_DIR}/10x_moby_dick.txt COPYONLY)
 
 set(PROJECT_SOURCES entry.h entry.cpp word_counter.h word_counter.cpp)
 

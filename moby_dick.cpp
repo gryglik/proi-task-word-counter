@@ -6,7 +6,7 @@ int main()
 {
     WordCounter wc;
     std::ifstream in;
-    // Create time
+    // Creation time
     in.open("moby_dick.txt");
     auto start_time = std::chrono::high_resolution_clock::now();
     wc.addWords(in);
@@ -16,11 +16,11 @@ int main()
     std::cout << "Creation time: "
     << (end_time - start_time) / std::chrono::milliseconds(1) << " ms.\n";
 
-    //Lexicographical iteration time
-    std::ofstream out("LEX.txt");
+    //Lexicographical iteration time (pre-incrementation)
+    std::ofstream out("LEX_pre.txt");
+    start_time = std::chrono::high_resolution_clock::now();
     auto it = wc.lexBegin();
     auto end = wc.lexEnd();
-    start_time = std::chrono::high_resolution_clock::now();
     while (it != end)
     {
         out << *it;
@@ -28,21 +28,35 @@ int main()
     }
     end_time = std::chrono::high_resolution_clock::now();
     out.close();
-    std::cout << "Lexicographical iteration time: "
+    std::cout << "Lexicographical iteration time (pre-incrementation): "
     << (end_time - start_time) / std::chrono::milliseconds(1) << " ms.\n";
 
-    //Frequency iteration time
-    std::ofstream out2("FREQ.txt");
-    auto it2 = wc.freqBegin();
-    auto end2 = wc.freqEnd();
+    //Lexicographical iteration time (post-incrementation)
+    std::ofstream out2("LEX_post.txt");
     start_time = std::chrono::high_resolution_clock::now();
-    while (it2 != end2)
+    it = wc.lexBegin();
+    end = wc.lexEnd();
+    while (it++ != end)
     {
-        out2 << *it2;
-        ++it2;
+        out2 << *it;
     }
     end_time = std::chrono::high_resolution_clock::now();
     out2.close();
+    std::cout << "Lexicographical iteration time (pre-incrementation): "
+    << (end_time - start_time) / std::chrono::milliseconds(1) << " ms.\n";
+
+    //Frequency iteration time
+    std::ofstream out3("FREQ.txt");
+    start_time = std::chrono::high_resolution_clock::now();
+    auto it2 = wc.freqBegin();
+    auto end2 = wc.freqEnd();
+    while (it2 != end2)
+    {
+        out3 << *it2;
+        ++it2;
+    }
+    end_time = std::chrono::high_resolution_clock::now();
+    out3.close();
     std::cout << "Frequency iteration time: "
     << (end_time - start_time) / std::chrono::milliseconds(1) << " ms.\n";
 
